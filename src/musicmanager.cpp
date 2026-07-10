@@ -1,3 +1,8 @@
+// Module
+// File: musicmanager.cpp   Version: 0.1.0   License: AGPLv3
+// Created:LuoJianqiu 2455043129@qq.com
+// Description: Realize functions to control playback modes and load local lyrics.
+
 #include "musicmanager.h"
 #include "playlistmodel.h"
 #include <QDebug>

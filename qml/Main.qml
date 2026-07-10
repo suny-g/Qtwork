@@ -1,3 +1,8 @@
+// Module
+// File:Main.qml  Version: 0.1.0   License: AGPLv3
+// Created: Luojianqiu  2455043129@qq.com
+// Description:develop a graphical user interface
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

@@ -1,3 +1,7 @@
+// Module
+// File: main.cpp   Version: 0.1.0   License: AGPLv3
+// Created: Luojianqiu  2455043129@qq.com
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>

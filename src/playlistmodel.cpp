@@ -1,3 +1,9 @@
+// Module
+// File: playlistmodel.cpp   Version: 0.1.0   License: AGPLv3
+// Created:Luojianqiu  2455043129@qq.com
+// Description: Save and manage the information of all songs
+
+
 #include "playlistmodel.h"
 #include <QDebug>
 
