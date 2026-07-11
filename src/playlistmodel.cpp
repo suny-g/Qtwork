@@ -150,6 +150,21 @@ QUrl PlaylistModel::getUrl(int index) const
     return m_songs[index].url;  // 返回歌曲的文件路径
 }
 
+QVariantMap PlaylistModel::get(int index) const
+{
+    QVariantMap map;
+    if (index < 0 || index >= m_songs.count()) {
+        return map;
+    }
+    const SongInfo &song = m_songs[index];
+    map["title"] = song.title;
+    map["artist"] = song.artist;
+    map["album"] = song.album;
+    map["duration"] = song.duration;
+    map["url"] = song.url;
+    return map;
+}
+
 void PlaylistModel::saveSongs() const
 {
     // 创建设置对象（

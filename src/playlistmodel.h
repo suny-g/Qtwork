@@ -13,7 +13,7 @@
 struct SongInfo
 {
     QString title; // 歌曲标题
-    QString artist; // 艺术家
+    QString artist; // 作者
     QString album; // 专辑名称
     qint64 duration; // 时长（毫秒）
     QUrl url; // 文件路径 URL
@@ -52,6 +52,7 @@ public:
     Q_INVOKABLE void removeSong(int index); //从播放列表中移除指定索引的歌曲
     Q_INVOKABLE void clear();  //清空整个播放列表
     Q_INVOKABLE QUrl getUrl(int index) const; //返回指定索引歌曲的文件URL
+    Q_INVOKABLE QVariantMap get(int index) const; //返回指定索引歌曲的数据，用于QML访问
 
     void saveSongs() const;  //将播放列表保存到持久化存储
     void loadSongs();  //从持久化存储恢复播放列表

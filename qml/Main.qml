@@ -143,6 +143,30 @@ ApplicationWindow {
                 enabled: musicManager.isPlaying
                 onClicked: musicManager.stop()
             }
+
+            // 播放模式切换按钮
+            Button {
+                text: {
+                    switch (musicManager.playbackMode) {
+                    case 0: return "🔁 顺序"
+                    case 1: return "🔀 随机"
+                    case 2: return "🔂 单曲"
+                    default: return "🔁 顺序"
+                    }
+                }
+                font.pixelSize: 12
+                onClicked: musicManager.cyclePlaybackMode()
+                ToolTip.text: {
+                    switch (musicManager.playbackMode) {
+                    case 0: return "顺序播放"
+                    case 1: return "随机播放"
+                    case 2: return "单曲循环"
+                    default: return "顺序播放"
+                    }
+                }
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+            }
         }
 
         // 播放列表

@@ -18,8 +18,12 @@ int main(int argc, char *argv[])
     MusicManager musicManager;
     MetadataReader metadataReader;
 
+
     engine.rootContext()->setContextProperty("musicManager", &musicManager);
     engine.rootContext()->setContextProperty("metadataReader", &metadataReader);
+
+    // 启动时加载保存的播放列表
+    musicManager.loadPlaylist();
 
     engine.loadFromModule("Music", "Main");
 
