@@ -1,19 +1,23 @@
 // Module
 // File:Main.qml  Version: 0.1.0   License: AGPLv3
-// Created: Luojianqiu  2455043129@qq.com
+// Created: Luojianqiu  2455043129@qq.com，TuJunfeng 2150319601@qq.com
 // Description:develop a graphical user interface
 
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import Music
 
 ApplicationWindow {
     id: window
-    width: 500
-    height: 400
+    width: 800
+    height: 600
     visible: true
-    title: "音乐播放器"
+    title: "音乐播放器 v1.0"
+    color: Style.bgPrimary
+
+    property bool darkTheme: true
 
     menuBar: MenuBar {
         Menu {
@@ -29,19 +33,28 @@ ApplicationWindow {
                 onTriggered: Qt.quit()
             }
         }
+        Menu {
+            title: "视图"
+            Action {
+                text: darkTheme ? "切换浅色主题" : "切换深色主题"
+                onTriggered: {
+                    darkTheme = !darkTheme
+                    window.color = darkTheme ? Style.bgPrimary : "#f5f5f5"
+                }
+            }
+        }
     }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 15
-        spacing: 15
+        anchors.margins: Style.spacingLarge
+        spacing: Style.spacingLarge
 
-        // 当前播放信息
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 80
-            color: "#f0f0f0"
-            radius: 8
+            Layout.preferredHeight: 100
+            color: Style.bgSecondary
+            radius: Style.radiusNormal
 
             ColumnLayout {
                 anchors.centerIn: parent
@@ -56,8 +69,9 @@ ApplicationWindow {
                         }
                         return "未播放"
                     }
-                    font.pixelSize: 18
+                    font.pixelSize: Style.fontSizeTitle
                     font.bold: true
+                    color: Style.textPrimary
                     horizontalAlignment: Text.AlignHCenter
                 }
 
@@ -70,131 +84,188 @@ ApplicationWindow {
                         }
                         return "请选择音乐文件"
                     }
-                    font.pixelSize: 14
-                    color: "gray"
+                    font.pixelSize: Style.fontSizeNormal
+                    color: Style.textSecondary
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
         }
 
-        // 进度条
-        RowLayout {
+        Rectangle {
             Layout.fillWidth: true
-            spacing: 8
+            Layout.preferredHeight: 60
+            color: Style.bgSecondary
+            radius: Style.radiusNormal
 
-            Text {
-                text: formatTime(musicManager.position)
-                font.pixelSize: 12
-                color: "gray"
-            }
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: Style.spacingNormal
+                spacing: 5
 
-            Slider {
-                id: progressSlider
-                Layout.fillWidth: true
-                from: 0
-                to: Math.max(musicManager.duration, 1)
-                value: musicManager.position
-                onMoved: musicManager.seek(value)
-            }
+                Text {
+                    text: Style.formatDuration(musicManager.position)
+                    font.pixelSize: Style.fontSizeSmall
+                    color: Style.textSecondary
+                }
 
-            Text {
-                text: formatTime(musicManager.duration)
-                font.pixelSize: 12
-                color: "gray"
+                Slider {
+                    id: progressSlider
+                    Layout.fillWidth: true
+                    from: 0
+                    to: Math.max(musicManager.duration, 1)
+                    value: musicManager.position
+                    onMoved: musicManager.seek(value)
+
+                    background: Rectangle {
+                        color: Style.bgTertiary
+                        radius: 4
+                        height: 6
+                    }
+
+                    handle: Rectangle {
+                        x: progressSlider.leftPadding + progressSlider.visualPosition * (progressSlider.availableWidth - width)
+                        y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
+                        width: 16
+                        height: 16
+                        radius: 8
+                        color: Style.accentRed
+                    }
+                }
+
+                Text {
+                    text: Style.formatDuration(musicManager.duration)
+                    font.pixelSize: Style.fontSizeSmall
+                    color: Style.textSecondary
+                }
             }
         }
 
-        // 控制按钮
-        RowLayout {
+        Rectangle {
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 20
+            Layout.preferredHeight: 80
+            color: Style.bgSecondary
+            radius: Style.radiusNormal
 
-            Button {
-                text: "⏮"
-                font.pixelSize: 24
-                enabled: musicManager.playlistModel.count > 0
-                onClicked: musicManager.previous()
-            }
+            RowLayout {
+                anchors.centerIn: parent
+                spacing: Style.spacingLarge
 
-            Button {
-                text: musicManager.isPlaying ? "⏸" : "▶"
-                font.pixelSize: 30
-                enabled: musicManager.playlistModel.count > 0
-                onClicked: {
-                    if (musicManager.isPlaying) {
-                        musicManager.pause()
-                    } else {
-                        musicManager.play()
+                Button {
+                    text: "⏮"
+                    font.pixelSize: 24
+                    enabled: musicManager.playlistModel.count > 0
+                    onClicked: musicManager.previous()
+                    background: Rectangle {
+                        color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                        radius: Style.radiusNormal
                     }
                 }
-            }
 
-            Button {
-                text: "⏭"
-                font.pixelSize: 24
-                enabled: musicManager.playlistModel.count > 0
-                onClicked: musicManager.next()
-            }
-
-            Button {
-                text: "⏹"
-                font.pixelSize: 24
-                enabled: musicManager.isPlaying
-                onClicked: musicManager.stop()
-            }
-
-            // 播放模式切换按钮
-            Button {
-                text: {
-                    switch (musicManager.playbackMode) {
-                    case 0: return "🔁 顺序"
-                    case 1: return "🔀 随机"
-                    case 2: return "🔂 单曲"
-                    default: return "🔁 顺序"
+                Button {
+                    text: musicManager.isPlaying ? "⏸" : "▶"
+                    font.pixelSize: 32
+                    enabled: musicManager.playlistModel.count > 0
+                    onClicked: {
+                        if (musicManager.isPlaying) {
+                            musicManager.pause()
+                        } else {
+                            musicManager.play()
+                        }
+                    }
+                    background: Rectangle {
+                        color: parent.hovered ? Style.accentRedHover : Style.accentRed
+                        radius: Style.radiusNormal
                     }
                 }
-                font.pixelSize: 12
-                onClicked: musicManager.cyclePlaybackMode()
-                ToolTip.text: {
-                    switch (musicManager.playbackMode) {
-                    case 0: return "顺序播放"
-                    case 1: return "随机播放"
-                    case 2: return "单曲循环"
-                    default: return "顺序播放"
+
+                Button {
+                    text: "⏭"
+                    font.pixelSize: 24
+                    enabled: musicManager.playlistModel.count > 0
+                    onClicked: musicManager.next()
+                    background: Rectangle {
+                        color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                        radius: Style.radiusNormal
                     }
                 }
-                ToolTip.visible: hovered
-                ToolTip.delay: 500
+
+                Button {
+                    text: "⏹"
+                    font.pixelSize: 24
+                    enabled: musicManager.isPlaying
+                    onClicked: musicManager.stop()
+                    background: Rectangle {
+                        color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                        radius: Style.radiusNormal
+                    }
+                }
+
+                Button {
+                    text: {
+                        switch (musicManager.playbackMode) {
+                            case 0: return "🔁 顺序"
+                            case 1: return "🔀 随机"
+                            case 2: return "🔂 单曲"
+                            default: return "🔁 顺序"
+                        }
+                    }
+                    font.pixelSize: 12
+                    onClicked: musicManager.cyclePlaybackMode()
+                    ToolTip.text: {
+                        switch (musicManager.playbackMode) {
+                            case 0: return "顺序播放"
+                            case 1: return "随机播放"
+                            case 2: return "单曲循环"
+                            default: return "顺序播放"
+                        }
+                    }
+                    ToolTip.visible: hovered
+                    background: Rectangle {
+                        color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                        radius: Style.radiusNormal
+                    }
+                }
             }
         }
 
-        // 播放列表
         GroupBox {
             Layout.fillWidth: true
             Layout.fillHeight: true
             title: "播放列表 (" + musicManager.playlistModel.count + " 首)"
+            background: Rectangle { color: Style.bgSecondary; radius: Style.radiusNormal }
 
             ListView {
                 id: listView
                 anchors.fill: parent
+                anchors.margins: 5
                 model: musicManager.playlistModel
                 clip: true
 
                 delegate: Rectangle {
                     width: listView.width
-                    height: 40
-                    color: index === musicManager.playlistModel.currentIndex ? "#e0e0e0" : "white"
+                    height: 50
+                    color: index === musicManager.playlistModel.currentIndex ? Style.accentRed : (hovered ? Style.bgHover : "transparent")
+                    radius: 4
+
+                    property bool hovered: false
+
+                    TapHandler {
+                        onTapped: musicManager.playIndex(index)
+                    }
+
+                    HoverHandler {
+                        onHoveredChanged: parent.hovered = hovered
+                    }
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.margins: 8
+                        anchors.margins: 10
                         spacing: 10
 
                         Text {
                             text: index + 1
-                            color: "gray"
-                            font.pixelSize: 12
+                            color: index === musicManager.playlistModel.currentIndex ? "white" : Style.textSecondary
+                            font.pixelSize: Style.fontSizeSmall
                             Layout.minimumWidth: 25
                         }
 
@@ -204,22 +275,25 @@ ApplicationWindow {
 
                             Text {
                                 text: model.title || "未知歌曲"
-                                font.pixelSize: 13
+                                font.pixelSize: Style.fontSizeNormal
+                                color: index === musicManager.playlistModel.currentIndex ? "white" : Style.textPrimary
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
+                            }
+
+                            Text {
+                                text: model.artist || "未知艺术家"
+                                font.pixelSize: Style.fontSizeSmall
+                                color: index === musicManager.playlistModel.currentIndex ? "#ffd6d6" : Style.textSecondary
+                                elide: Text.ElideRight
                             }
                         }
 
                         Text {
-                            text: formatTime(model.duration)
-                            color: "gray"
-                            font.pixelSize: 12
+                            text: Style.formatDuration(model.duration)
+                            color: index === musicManager.playlistModel.currentIndex ? "#ffd6d6" : Style.textSecondary
+                            font.pixelSize: Style.fontSizeSmall
                         }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: musicManager.playIndex(index)
                     }
                 }
 
@@ -228,7 +302,6 @@ ApplicationWindow {
         }
     }
 
-    // 文件选择对话框
     FileDialog {
         id: fileDialog
         title: "选择音频文件"
@@ -242,24 +315,13 @@ ApplicationWindow {
         }
     }
 
-    // 元数据读取信号连接
     Connections {
         target: metadataReader
         function onMetadataReady(url, title, artist, album, duration) {
             musicManager.playlistModel.addSong(url, title, artist, album, duration)
-            // 如果是第一首，自动播放
             if (musicManager.playlistModel.count === 1) {
                 musicManager.playIndex(0)
             }
         }
-    }
-
-    // 辅助函数
-    function formatTime(ms) {
-        if (!ms || ms <= 0) return "0:00"
-        var totalSeconds = Math.floor(ms / 1000)
-        var minutes = Math.floor(totalSeconds / 60)
-        var seconds = totalSeconds % 60
-        return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds)
     }
 }
