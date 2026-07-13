@@ -29,6 +29,10 @@ qt_add_qml_module(appMy_Music
     QML_FILES
         qml/Main.qml
         qml/Style.qml
+        qml/components/SongInfoPanel.qml
+        qml/components/ProgressBar.qml
+        qml/components/PlaybackControls.qml
+        qml/components/PlaylistView.qml
 )
 
 target_sources(appMy_Music PRIVATE
