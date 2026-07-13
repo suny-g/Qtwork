@@ -1,14 +1,12 @@
-// Module
-// File:Main.qml  Version: 0.1.0   License: AGPLv3
-// Created: Luojianqiu  2455043129@qq.com，TuJunfeng 2150319601@qq.com
-// Description:develop a graphical user interface
-
+//Module
+//File: SongInfoPanel.qml
+//Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-13
+//Version: 1.0      License: AGPLv3
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import Music
-
 import "components"
 
 ApplicationWindow {
@@ -52,13 +50,56 @@ ApplicationWindow {
         anchors.margins: Style.spacingLarge
         spacing: Style.spacingLarge
 
-        SongInfoPanel {}
+        // 1. 播放列表：占据所有剩余空间
+        PlaylistView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
 
-        ProgressBar {}
+        // 2. 底部控制栏（固定高度）
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 160        // 根据内容调整
+            color: Style.bgSecondary
+            radius: Style.radiusNormal
 
-        PlaybackControls {}
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: Style.spacingNormal
+                spacing: Style.spacingSmall
 
-        PlaylistView {}
+                // 进度条
+                ProgressBar {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 30
+                }
+
+                // 控制区：左侧歌曲信息 + 中间控制按钮 + 右侧音量
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: Style.spacingLarge
+
+                    // 左侧：歌曲信息（固定宽度）
+                    SongInfoPanel {
+                        Layout.preferredWidth: 250
+                        Layout.fillHeight: true
+                    }
+
+                    // 中间：控制按钮（居中）
+                    PlaybackControls {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                    }
+
+                    // 右侧：音量控制（固定宽度）
+                    // VolumeControl {
+                    //     Layout.preferredWidth: 150
+                    //     Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                    // }
+                }
+            }
+        }
     }
 
     FileDialog {
