@@ -93,10 +93,10 @@ ApplicationWindow {
                     }
 
                     // 右侧：音量控制（固定宽度）
-                    // VolumeControl {
-                    //     Layout.preferredWidth: 150
-                    //     Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                    // }
+                    VolumeControl {
+                        Layout.preferredWidth: 150
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                    }
                 }
             }
         }

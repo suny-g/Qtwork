@@ -33,6 +33,7 @@ qt_add_qml_module(appMy_Music
         qml/components/ProgressBar.qml
         qml/components/PlaybackControls.qml
         qml/components/PlaylistView.qml
+        QML_FILES qml/components/VolumeControl.qml
 )
 
 target_sources(appMy_Music PRIVATE

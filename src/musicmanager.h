@@ -1,5 +1,5 @@
 // Module
-// File: main.cpp   Version: 0.1.0   License: AGPLv3
+// File: musicmanager.cpp   Version: 0.1.0   License: AGPLv3
 // Created: Luojianqiu  2455043129@qq.com
 
 #pragma once
@@ -37,7 +37,8 @@ public:
     qint64 position() const; // 返回当前播放位置
     void setPosition(qint64 position); //用于跳转到歌曲的指定播放位置
     float volume() const; //返回当前音量值
-    void setVolume(float volume); //设置音量值
+    //void setVolume(float volume); //设置音量值
+    Q_INVOKABLE void setVolume(float volume); //设置音量值
     PlaylistModel* playlistModel() const; //返回播放列表模型的指针
 
     Q_INVOKABLE void play(); //播放音乐
