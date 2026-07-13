@@ -1,5 +1,5 @@
 // File:lyricssearcher.h   Version: 0.1.0   License: AGPLv3
-// Created:Junfeng Tu  2150139603@qq.com
+// Created:Junfeng Tu  2150319601@qq.com
 // Description: Lyrics searcher class for searching local .lrc files
 
 #pragma once

@@ -1,3 +1,7 @@
+// File:PlaylistView.qml   Version: 0.1.0   License: AGPLv3
+// Created:Junfeng Tu  2150319601@qq.com
+// Description: Playlist view component with song list and tap-to-play
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

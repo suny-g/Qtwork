@@ -1,6 +1,6 @@
 //
 //File: PlaybackControls.qml
-//Created:        2026-07-13
+//Created: Guang Yang 2087167099@qq.com       2026-07-13
 //Version: 1.0      License: AGPLv3
 import QtQuick
 import QtQuick.Controls
@@ -21,24 +21,26 @@ Rectangle {
 
         // 上一首
         Button {
+            id: prevBtn
             implicitWidth: 44
             implicitHeight: 44
             text: "⏮"
-            font.pixelSize: 24          // 统一为 24
+            font.pixelSize: 24
             enabled: musicManager.playlistModel.count > 0
             onClicked: musicManager.previous()
             background: Rectangle {
-                color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                color: prevBtn.hovered ? Style.bgHover : Style.bgTertiary
                 radius: Style.radiusNormal
             }
         }
 
         // 播放/暂停
         Button {
+            id: playBtn
             implicitWidth: 44
             implicitHeight: 44
             text: musicManager.isPlaying ? "⏸" : "▶"
-            font.pixelSize: 24          // 从 32 改为 24，统一大小
+            font.pixelSize: 24
             enabled: musicManager.playlistModel.count > 0
             onClicked: {
                 if (musicManager.isPlaying) {
@@ -48,41 +50,44 @@ Rectangle {
                 }
             }
             background: Rectangle {
-                color: parent.hovered ? Style.accentRedHover : Style.accentRed
+                color: playBtn.hovered ? Style.accentRedHover : Style.accentRed
                 radius: Style.radiusNormal
             }
         }
 
         // 下一首
         Button {
+            id: nextBtn
             implicitWidth: 44
             implicitHeight: 44
             text: "⏭"
-            font.pixelSize: 24          // 统一为 24
+            font.pixelSize: 24
             enabled: musicManager.playlistModel.count > 0
             onClicked: musicManager.next()
             background: Rectangle {
-                color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                color: nextBtn.hovered ? Style.bgHover : Style.bgTertiary
                 radius: Style.radiusNormal
             }
         }
 
-        // 停止（为保持一致也调整）
+        // 停止
         Button {
+            id: stopBtn
             implicitWidth: 44
             implicitHeight: 44
             text: "⏹"
-            font.pixelSize: 24          // 统一为 24
+            font.pixelSize: 24
             enabled: musicManager.isPlaying
             onClicked: musicManager.stop()
             background: Rectangle {
-                color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                color: stopBtn.hovered ? Style.bgHover : Style.bgTertiary
                 radius: Style.radiusNormal
             }
         }
 
         // 播放模式切换
         Button {
+            id: modeBtn
             implicitWidth: 44
             implicitHeight: 44
             text: {
@@ -103,9 +108,9 @@ Rectangle {
                     default: return "顺序播放"
                 }
             }
-            ToolTip.visible: hovered
+            ToolTip.visible: modeBtn.hovered
             background: Rectangle {
-                color: parent.hovered ? Style.bgHover : Style.bgTertiary
+                color: modeBtn.hovered ? Style.bgHover : Style.bgTertiary
                 radius: Style.radiusNormal
             }
         }

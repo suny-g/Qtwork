@@ -1,5 +1,5 @@
 // File:LyricsDisplay.qml   Version: 0.1.0   License: AGPLv3
-// Created:Junfeng Tu  2150139603@qq.com
+// Created:Junfeng Tu  2150319601@qq.com
 // Description: NetEase Cloud Music style lyrics display component
 
 import QtQuick
@@ -58,29 +58,36 @@ Rectangle {
             border.color: Style.borderNormal
             border.width: 1
 
-            ScrollView {
+            ListView {
+                id: lyricsView
                 anchors.fill: parent
                 anchors.margins: Style.spacingNormal
-                ScrollBar.vertical: ScrollBar {
-                    policy: ScrollBar.AlwaysOn
+                clip: true
+                model: musicManager.lyrics
+                currentIndex: musicManager.currentLyricLine
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: musicManager.lyrics.length === 0
+                    text: "暂无歌词"
+                    color: Style.textTertiary
+                    font.pixelSize: Style.fontSizeNormal
                 }
 
-                Column {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Style.spacingLarge
+                delegate: Item {
+                    width: lyricsView.width
+                    height: 60
 
-                    Repeater {
-                        model: musicManager.lyrics
-                        delegate: Text {
-                            text: modelData.text || ""
-                            font.pixelSize: Style.fontSizeNormal
-                            color: index === musicManager.currentLyricLine ? Style.accentRed : Style.textSecondary
-                            font.bold: index === musicManager.currentLyricLine
-                            horizontalAlignment: Text.AlignHCenter
-                            wrapMode: Text.WordWrap
-                            width: parent.width * 0.8
-                            padding: Style.spacingSmall
-                        }
+                    Text {
+                        anchors.centerIn: parent
+                        width: parent.width - 80
+                        text: modelData.text || ""
+                        color: index === musicManager.currentLyricLine ? Style.accentRed : Style.textSecondary
+                        font.pixelSize: index === musicManager.currentLyricLine
+                                       ? Style.fontSizeTitle : Style.fontSizeNormal
+                        font.bold: index === musicManager.currentLyricLine
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
                     }
                 }
             }
