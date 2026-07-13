@@ -14,10 +14,18 @@ ApplicationWindow {
     width: 800
     height: 600
     visible: true
-    title: "音乐播放器 v1.0"
+    title: "音乐播放器 v2.0"
     color: Style.bgPrimary
 
     property bool darkTheme: true
+    property int currentView: 0
+    onCurrentViewChanged: {
+        if (currentView === 0) {
+            mainStack.replace(mainStack.initialItem)
+        } else {
+            mainStack.replace(lyricsComponent)
+        }
+    }
 
     menuBar: MenuBar {
         Menu {
@@ -50,16 +58,57 @@ ApplicationWindow {
         anchors.margins: Style.spacingLarge
         spacing: Style.spacingLarge
 
-        // 1. 播放列表：占据所有剩余空间
-        PlaylistView {
+        RowLayout {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            spacing: Style.spacingSmall
+
+            Button {
+                text: "播放列表"
+                font.pixelSize: Style.fontSizeNormal
+                checked: currentView === 0
+                checkable: true
+                onClicked: currentView = 0
+                background: Rectangle {
+                    color: parent.checked ? Style.accentRed : Style.bgSecondary
+                    radius: Style.radiusSmall
+                }
+            }
+
+            Button {
+                text: "歌词"
+                font.pixelSize: Style.fontSizeNormal
+                checked: currentView === 1
+                checkable: true
+                onClicked: currentView = 1
+                background: Rectangle {
+                    color: parent.checked ? Style.accentRed : Style.bgSecondary
+                    radius: Style.radiusSmall
+                }
+            }
         }
 
-        // 2. 底部控制栏（固定高度）
+        StackView {
+            id: mainStack
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            initialItem: PlaylistView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            Component {
+                id: lyricsComponent
+                LyricsDisplay {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+            }
+        }
+
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 160        // 根据内容调整
+            Layout.preferredHeight: 160
             color: Style.bgSecondary
             radius: Style.radiusNormal
 
@@ -68,31 +117,26 @@ ApplicationWindow {
                 anchors.margins: Style.spacingNormal
                 spacing: Style.spacingSmall
 
-                // 进度条
                 ProgressBar {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 30
                 }
 
-                // 控制区：左侧歌曲信息 + 中间控制按钮 + 右侧音量
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: Style.spacingLarge
 
-                    // 左侧：歌曲信息（固定宽度）
                     SongInfoPanel {
                         Layout.preferredWidth: 250
                         Layout.fillHeight: true
                     }
 
-                    // 中间：控制按钮（居中）
                     PlaybackControls {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                     }
 
-                    // 右侧：音量控制（固定宽度）
                     VolumeControl {
                         Layout.preferredWidth: 150
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight

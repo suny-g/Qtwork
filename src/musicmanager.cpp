@@ -22,8 +22,10 @@ MusicManager::MusicManager(QObject *parent)
     , m_player(new QMediaPlayer(this))        // 创建播放器对象
     , m_audioOutput(new QAudioOutput(this))   // 创建音频输出对象
     , m_playlistModel(new PlaylistModel(this)) // 创建播放列表模型
+    , m_lyricsSearcher(new LyricsSearcher(this)) // 创建歌词搜索器
     , m_currentIndex(-1)                      // -1 表示没有播放任何歌曲
     , m_playbackMode(Sequential)              // 默认顺序播放
+    , m_currentLyricLine(-1)                  // -1 表示没有当前歌词行
 {
     // 把音频输出设置给播放器
     m_player->setAudioOutput(m_audioOutput);
@@ -100,6 +102,12 @@ void MusicManager::setVolume(float volume)
 PlaylistModel* MusicManager::playlistModel() const
 {
     return m_playlistModel;
+}
+
+// 获取歌词搜索器
+LyricsSearcher* MusicManager::lyricsSearcher() const
+{
+    return m_lyricsSearcher;
 }
 
 // 播放
@@ -217,6 +225,23 @@ void MusicManager::onDurationChanged(qint64 duration)
 void MusicManager::onPositionChanged(qint64 position)
 {
     emit positionChanged(position);  // 告诉QML更新进度条位置
+
+    // 更新当前歌词行
+    if (m_lyrics.isEmpty()) {
+        return;
+    }
+
+    int newLine = -1;
+    for (int i = 0; i < m_lyrics.size(); ++i) {
+        QVariantMap line = m_lyrics[i].toMap();
+        int time = line.value("time").toInt();
+        if (time <= position) {
+            newLine = i;
+        } else {
+            break;
+        }
+    }
+    setCurrentLyricLine(newLine);
 }
 
 // 媒体状态变化时触发
@@ -298,6 +323,21 @@ QVariantList MusicManager::lyrics() const
     return m_lyrics;
 }
 
+// 获取当前歌词行索引
+int MusicManager::currentLyricLine() const
+{
+    return m_currentLyricLine;
+}
+
+// 设置当前歌词行索引
+void MusicManager::setCurrentLyricLine(int line)
+{
+    if (m_currentLyricLine != line) {
+        m_currentLyricLine = line;
+        emit currentLyricLineChanged();
+    }
+}
+
 // 计算顺序播放的下一首索引
 int MusicManager::nextSequentialIndex() const
 {
@@ -338,69 +378,80 @@ void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
 {
     m_lyrics.clear();
 
-    // 只支持本地文件
     if (!audioUrl.isLocalFile()) {
         updatePlaceholderLyrics();
         return;
     }
 
-    QFileInfo audioInfo(audioUrl.toLocalFile());
-    QString lrcPath = audioInfo.path() + QDir::separator() + audioInfo.completeBaseName() + ".lrc";
+    QString audioPath = audioUrl.toLocalFile();
+    QFileInfo audioInfo(audioPath);
+    QString lrcPath = audioInfo.absolutePath() + "/" + audioInfo.completeBaseName() + ".lrc";
 
-    // 打开歌词文件
-    QFile file(lrcPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        updatePlaceholderLyrics();
-    }
-
-    // 读取文件内容
-    QTextStream stream(&file);
-    stream.setEncoding(QStringConverter::Utf8);
-    const QString content = stream.readAll();
-    file.close();
-
-    const QRegularExpression regex(R"(^\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)$)");
-    const QStringList lines = content.split('\n');
-    bool parsedAny = false;
-
-    for (const QString &line : lines) {
-        const QRegularExpressionMatch match = regex.match(line.trimmed());
-        if (!match.hasMatch()) {
-            continue;  // 不是歌词行就跳过
-        }
-
-
-        int minutes = match.captured(1).toInt();
-        int seconds = match.captured(2).toInt();
-        QString fractional = match.captured(3);
-        QString text = match.captured(4).trimmed();
-
-
-        int fractionMs = 0;
-        if (fractional.length() == 2) {
-            fractionMs = fractional.toInt() * 10;
-        } else if (fractional.length() == 3) {
-            fractionMs = fractional.toInt();
-        }
-
-        int timeMs = minutes * 60000 + seconds * 1000 + fractionMs;
-
-        // 添加到歌词列表
-        m_lyrics.append(QVariantMap{{"time", timeMs}, {"text", text}});
-        parsedAny = true;
-    }
-
-    // 如果没有解析到任何歌词，显示占位
-    if (!parsedAny) {
+    QFile lrcFile(lrcPath);
+    if (!lrcFile.exists() || !lrcFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         updatePlaceholderLyrics();
         return;
     }
 
-    // 按时间从小到大排序
-    std::sort(m_lyrics.begin(), m_lyrics.end(), [](const QVariant &a, const QVariant &b) {
-        return a.toMap().value("time").toInt() < b.toMap().value("time").toInt();
-    });
+    QTextStream stream(&lrcFile);
+    stream.setEncoding(QStringConverter::Utf8);
+    QList<QPair<int, QString>> parsedLines;
 
-    // 告诉 QML 歌词更新了
+    QRegularExpression re("\\[(\\d+):(\\d+)\\.(\\d+)\\]");
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        QRegularExpressionMatchIterator it = re.globalMatch(line);
+        QList<int> timestamps;
+        int firstMatchEnd = -1;
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            int minutes = match.captured(1).toInt();
+            int seconds = match.captured(2).toInt();
+            QString fracStr = match.captured(3);
+            int frac = fracStr.toInt();
+            int msec = 0;
+            if (fracStr.length() == 1) {
+                msec = frac * 100;
+            } else if (fracStr.length() == 2) {
+                msec = frac * 10;
+            } else {
+                msec = frac;
+            }
+            int timeMs = minutes * 60000 + seconds * 1000 + msec;
+            timestamps.append(timeMs);
+            if (firstMatchEnd < 0) {
+                firstMatchEnd = match.capturedEnd();
+            }
+        }
+
+        if (timestamps.isEmpty()) {
+            continue;
+        }
+
+        QString text = line.mid(firstMatchEnd).trimmed();
+        for (int ts : timestamps) {
+            parsedLines.append(qMakePair(ts, text));
+        }
+    }
+
+    lrcFile.close();
+
+    std::sort(parsedLines.begin(), parsedLines.end(),
+              [](const QPair<int, QString> &a, const QPair<int, QString> &b) {
+                  return a.first < b.first;
+              });
+
+    for (const auto &p : parsedLines) {
+        QVariantMap entry;
+        entry["time"] = p.first;
+        entry["text"] = p.second;
+        m_lyrics.append(entry);
+    }
+
+    if (m_lyrics.isEmpty()) {
+        updatePlaceholderLyrics();
+    }
+
+    setCurrentLyricLine(-1);
     emit lyricsChanged();
 }

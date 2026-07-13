@@ -16,6 +16,7 @@ set(SOURCES_CXX
     src/musicmanager.cpp
     src/playlistmodel.cpp
     src/metadatareader.cpp
+    src/lyricssearcher.cpp
 )
 
 qt_add_executable(appMy_Music
@@ -33,13 +34,15 @@ qt_add_qml_module(appMy_Music
         qml/components/ProgressBar.qml
         qml/components/PlaybackControls.qml
         qml/components/PlaylistView.qml
-        QML_FILES qml/components/VolumeControl.qml
+        qml/components/VolumeControl.qml
+        qml/components/LyricsDisplay.qml
 )
 
 target_sources(appMy_Music PRIVATE
     src/musicmanager.h
     src/playlistmodel.h
     src/metadatareader.h
+    src/lyricssearcher.h
 )
 
 target_include_directories(appMy_Music PRIVATE src)

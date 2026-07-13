@@ -9,6 +9,7 @@
 #include <QAudioOutput>
 #include <QUrl>
 #include "playlistmodel.h"
+#include "lyricssearcher.h"
 
 class MusicManager : public QObject
 {
@@ -20,6 +21,8 @@ class MusicManager : public QObject
     Q_PROPERTY(PlaylistModel* playlistModel READ playlistModel CONSTANT)
     Q_PROPERTY(int playbackMode READ playbackMode WRITE setPlaybackMode NOTIFY playbackModeChanged)
     Q_PROPERTY(QVariantList lyrics READ lyrics NOTIFY lyricsChanged)
+    Q_PROPERTY(LyricsSearcher* lyricsSearcher READ lyricsSearcher CONSTANT)
+    Q_PROPERTY(int currentLyricLine READ currentLyricLine NOTIFY currentLyricLineChanged)
 
 public:
     enum PlaybackMode {
@@ -53,9 +56,13 @@ public:
     Q_INVOKABLE void loadPlaylist();  // 从硬盘加载之前保存的播放列表
     void savePlaylist();
 
+    LyricsSearcher* lyricsSearcher() const;  //获取歌词搜索器
+
     int playbackMode() const;  //获取当前的播放模式
     void setPlaybackMode(int mode);  //设置播放模式
     QVariantList lyrics() const;  //获取歌词列表
+    int currentLyricLine() const;  //获取当前歌词行索引
+    void setCurrentLyricLine(int line);  //设置当前歌词行索引
 
 signals:
     void isPlayingChanged(bool isPlaying);  //通知QML播放状态变了
@@ -64,6 +71,7 @@ signals:
     void volumeChanged(float volume);  //通知QML音量变了
     void playbackModeChanged(int playbackMode);  // 通知QML播放模式变了
     void lyricsChanged();  //通知QML歌词更新
+    void currentLyricLineChanged();  //通知QML当前歌词行变化
 
 private slots:
     void onPlayerStateChanged(QMediaPlayer::PlaybackState state);  //通知QML更新界面
@@ -77,9 +85,11 @@ private:
     QMediaPlayer *m_player; //指向播放器
     QAudioOutput *m_audioOutput; //控制声音输出
     PlaylistModel *m_playlistModel; //存储所有歌曲数据
+    LyricsSearcher *m_lyricsSearcher; //歌词搜索器
     int m_currentIndex;  //记录当前播放的是第几首歌
     int m_playbackMode;  //记录当前的播放模式
     QVariantList m_lyrics;  //存储歌词数据的列表
+    int m_currentLyricLine;  //当前歌词行索引
 
     int nextSequentialIndex() const;  //计算顺序模式下的下一首索引
     int nextShuffleIndex() const; //计算随机模式下的下一首索引
