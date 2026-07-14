@@ -138,7 +138,7 @@ Rectangle {
                 Text { text: "我喜欢"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
             HoverHandler { onHoveredChanged: parent.hovered5 = hovered }
-            TapHandler { onTapped: viewChanged(0) }
+            TapHandler { onTapped: viewChanged(2) }
         }
 
         Item { Layout.fillHeight: true }
