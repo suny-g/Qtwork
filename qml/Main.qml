@@ -1,7 +1,8 @@
 //Module
-//File: SongInfoPanel.qml
-//Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-13
-//Version: 1.0      License: AGPLv3
+//File: Main.qml
+//Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-14
+//Version: 2.0      License: AGPLv3
+// Description: 主窗口 — 网易云风格布局，支持播放列表/歌词视图切换
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -106,39 +107,59 @@ ApplicationWindow {
             }
         }
 
+        // 底部控制栏
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 160
+            Layout.preferredHeight: 72
             color: Style.bgSecondary
-            radius: Style.radiusNormal
+            radius: 0
+
+            // 顶部分割线
+            Rectangle {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 1
+                color: Style.borderLight
+            }
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: Style.spacingNormal
-                spacing: Style.spacingSmall
+                anchors.leftMargin: Style.spacingLarge
+                anchors.rightMargin: Style.spacingLarge
+                anchors.topMargin: Style.spacingSmall
+                anchors.bottomMargin: Style.spacingSmall
+                spacing: 0
 
+                // 进度条
                 ProgressBar {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 30
+                    Layout.preferredHeight: 20
                 }
 
+                // 三栏布局：左侧歌曲信息，中间控制按钮，右侧音量
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    spacing: Style.spacingLarge
+                    spacing: Style.spacingNormal
 
+                    // 左侧：歌曲信息
                     SongInfoPanel {
-                        Layout.preferredWidth: 250
                         Layout.fillHeight: true
+                        Layout.preferredWidth: 240
                     }
 
+                    // 中间：控制按钮
                     PlaybackControls {
+                        Layout.fillHeight: true
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                     }
 
+                    // 右侧：音量控制
                     VolumeControl {
-                        Layout.preferredWidth: 150
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 140
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                     }
                 }
