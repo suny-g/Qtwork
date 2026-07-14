@@ -37,6 +37,7 @@ qt_add_qml_module(appMy_Music
         qml/components/VolumeControl.qml
         qml/components/LyricsDisplay.qml
         QML_FILES qml/Sidebar.qml
+        QML_FILES qml/components/LikedSongsView.qml
 )
 
 target_sources(appMy_Music PRIVATE

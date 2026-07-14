@@ -128,7 +128,7 @@ Rectangle {
                 Text { text: "\u2665"; font.pixelSize: 14; color: Style.textSecondary }
                 Text { text: "我喜欢"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
-            MouseArea { id: ma5; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(0) }
+           MouseArea { id: ma5; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(2) }
         }
 
         Item { Layout.fillHeight: true }

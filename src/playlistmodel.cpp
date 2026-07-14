@@ -8,28 +8,29 @@
 #include <QDebug>
 
 PlaylistModel::PlaylistModel(QObject *parent)
-    : QAbstractListModel(parent)    // 调用父类构造函数
-    , m_currentIndex(-1)            // -1 表示没有播放任何歌曲
+    : QAbstractListModel(parent)    //调用父类构造函数
+    , m_currentIndex(-1)            //-1 表示没有播放任何歌曲
 {
+    loadLikedSongs();
     qDebug() << "PlaylistModel initialized";
 }
 
 int PlaylistModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_songs.count();  // 返回歌曲总数
+    return m_songs.count();//返回歌曲总数
 }
 
 QVariant PlaylistModel::data(const QModelIndex &index, int role) const
 {
-    // 检查索引有没有效
+    //检查索引有没有效
     if (index.row() < 0 || index.row() >= m_songs.count())
         return QVariant();
 
-    // 拿到这一行的歌曲数据
+    //拿到这一行的歌曲数据
     const SongInfo &song = m_songs[index.row()];
 
-    // 根据角色返回不同的字段
+    //根据角色返回不同的字段
     switch (role) {
     case TitleRole:      return song.title;     // 标题
     case ArtistRole:     return song.artist;    // 艺术家
@@ -54,21 +55,21 @@ QHash<int, QByteArray> PlaylistModel::roleNames() const
 
 int PlaylistModel::count() const
 {
-    return m_songs.count();  // 返回歌曲数量
+    return m_songs.count();//返回歌曲数量
 }
 
 int PlaylistModel::currentIndex() const
 {
-    return m_currentIndex;  // 返回当前播放到第几首，-1 表示没有
+    return m_currentIndex;//返回当前播放到第几首，-1 表示没有
 }
 
 
 void PlaylistModel::setCurrentIndex(int index)
 {
-    // 只有索引变了才更新，避免重复发射信号
+    //只有索引变了才更新，避免重复发射信号
     if (m_currentIndex != index) {
         m_currentIndex = index;
-        emit currentIndexChanged();  // 通知QML当前播放位置变了
+        emit currentIndexChanged();//通知QML当前播放位置变了
     }
 }
 
@@ -97,20 +98,20 @@ void PlaylistModel::addSong(const QUrl &url, const QString &title,
 
 void PlaylistModel::removeSong(int index)
 {
-    // 检查索引有没有效
+    //检查索引有没有效
     if (index < 0 || index >= m_songs.count())
         return;
 
-    // 告诉视图要删除一行数据
+    //告诉视图要删除一行数据
     beginRemoveRows(QModelIndex(), index, index);
 
-    // 真正删除数据
+    //真正删除数据
     m_songs.removeAt(index);
 
-    // 更新显示
+    //更新显示
     endRemoveRows();
 
-    //  如果当前播放的索引超出了范围，调整到最后一首
+    //如果当前播放的索引超出了范围，调整到最后一首
     if (m_currentIndex >= m_songs.count()) {
         setCurrentIndex(m_songs.count() - 1);
     }
@@ -129,11 +130,11 @@ void PlaylistModel::clear()
 
     beginResetModel();
 
-    // 清空数据
+    //清空数据
     m_songs.clear();
-    m_currentIndex = -1;  // 重置当前索引
+    m_currentIndex = -1;  //重置当前索引
 
-    // 刷新
+    //刷新
     endResetModel();
 
     emit countChanged();
@@ -144,10 +145,10 @@ void PlaylistModel::clear()
 
 QUrl PlaylistModel::getUrl(int index) const
 {
-    // 检查索引有没有效
+    //检查索引有没有效
     if (index < 0 || index >= m_songs.count())
-        return QUrl();  // 无效就返回空
-    return m_songs[index].url;  // 返回歌曲的文件路径
+        return QUrl();  //无效就返回空
+    return m_songs[index].url;  //返回歌曲的文件路径
 }
 
 QVariantMap PlaylistModel::get(int index) const
@@ -167,50 +168,50 @@ QVariantMap PlaylistModel::get(int index) const
 
 void PlaylistModel::saveSongs() const
 {
-    // 创建设置对象（
+    //创建设置对象（
     QSettings settings("QTmusic", "QTmusic");
 
     QVariantList list;
     list.reserve(m_songs.size());
 
-    // 把每首歌转成 QVariantMap 格式，加到列表里
+    //把每首歌转成 QVariantMap 格式，加到列表里
     for (const SongInfo &song : m_songs) {
         list.append(songToMap(song));
     }
 
-    // 保存到硬盘
+    //保存到硬盘
     settings.setValue("playlist/songs", list);          // 所有歌曲
     settings.setValue("playlist/currentIndex", m_currentIndex);  // 当前播放位置
 }
 
 void PlaylistModel::loadSongs()
 {
-    // 打开设置
+    //打开设置
     QSettings settings("QTmusic", "QTmusic");
 
-    // 读取保存的歌曲列表
+    //读取保存的歌曲列表
     QVariantList list = settings.value("playlist/songs").toList();
 
-    // 如果没有数据就直接返回
+    //如果没有数据就直接返回
     if (list.isEmpty())
         return;
 
     beginResetModel();
 
-    // 清空当前数据
+    //清空当前数据
     m_songs.clear();
 
-    // 遍历读取到的数据，转成SongInfo并添加到列表
+    //遍历读取到的数据，转成SongInfo并添加到列表
     for (const QVariant &var : list) {
         QVariantMap map = var.toMap();
         if (!map.isEmpty())
             m_songs.append(songFromMap(map));
     }
 
-    // 恢复当前播放索引
+    //恢复当前播放索引
     m_currentIndex = settings.value("playlist/currentIndex", -1).toInt();
 
-    // 如果索引超出了范围，重置为 -1
+    //如果索引超出了范围，重置为 -1
     if (m_currentIndex >= m_songs.count())
         m_currentIndex = -1;
 
@@ -241,4 +242,62 @@ SongInfo PlaylistModel::songFromMap(const QVariantMap &map) const
     song.album = map.value("album").toString();
     song.duration = map.value("duration").toLongLong();    // 转回整数
     return song;
+}
+
+// 红心收藏
+
+void PlaylistModel::toggleLike(const QUrl &url)
+{
+    QString key = url.toString();
+    if (m_likedSongs.contains(key)) {
+        m_likedSongs.remove(key);
+    } else {
+        m_likedSongs.insert(key);
+    }
+    saveLikedSongs();
+    emit likedChanged();
+}
+
+bool PlaylistModel::isLiked(const QUrl &url) const
+{
+    return m_likedSongs.contains(url.toString());
+}
+
+QVariantList PlaylistModel::likedSongs() const
+{
+    QVariantList list;
+    for (const SongInfo &song : m_songs) {
+        if (m_likedSongs.contains(song.url.toString())) {
+            QVariantMap map;
+            map["title"] = song.title;
+            map["artist"] = song.artist;
+            map["album"] = song.album;
+            map["duration"] = song.duration;
+            map["url"] = song.url;
+            list.append(map);
+        }
+    }
+    return list;
+}
+
+void PlaylistModel::saveLikedSongs() const
+{
+    QSettings settings("QTmusic", "QTmusic");
+    QStringList urls;
+    urls.reserve(m_likedSongs.size());
+    for (const QString &url : m_likedSongs) {
+        urls.append(url);
+    }
+    settings.setValue("playlist/likedSongs", urls);
+}
+
+void PlaylistModel::loadLikedSongs()
+{
+    QSettings settings("QTmusic", "QTmusic");
+    QStringList urls = settings.value("playlist/likedSongs").toStringList();
+    m_likedSongs.clear();
+    m_likedSongs.reserve(urls.size());
+    for (const QString &url : urls) {
+        m_likedSongs.insert(url);
+    }
 }

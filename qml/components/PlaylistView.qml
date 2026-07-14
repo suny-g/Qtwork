@@ -63,6 +63,12 @@ GroupBox {
             radius: 4
 
             property bool hovered: false
+            property bool liked: musicManager.playlistModel.isLiked(model.url)
+
+            Connections {
+                target: musicManager.playlistModel
+                function onLikedChanged() { liked = musicManager.playlistModel.isLiked(model.url) }
+            }
 
             TapHandler {
                 onTapped: musicManager.playIndex(index)
@@ -102,6 +108,14 @@ GroupBox {
                         color: index === musicManager.playlistModel.currentIndex ? "#ffd6d6" : Style.textSecondary
                         elide: Text.ElideRight
                     }
+                }
+
+                // 红心图标
+                Text {
+                    text: liked ? "\u2665" : ""
+                    font.pixelSize: Style.fontSizeSmall
+                    color: index === musicManager.playlistModel.currentIndex ? "#ffd6d6" : Style.accentRed
+                    visible: liked
                 }
 
                 Text {

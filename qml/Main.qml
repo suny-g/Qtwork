@@ -15,7 +15,7 @@ ApplicationWindow {
     width: 800
     height: 600
     visible: true
-    title: "周易音乐播放器"
+    title: "周易云音乐播放器"
     color: Style.bgPrimary
 
     property bool darkTheme: true
@@ -23,8 +23,10 @@ ApplicationWindow {
     onCurrentViewChanged: {
         if (currentView === 0) {
             mainStack.replace(mainStack.initialItem)
-        } else {
+        } else if (currentView === 1) {
             mainStack.replace(lyricsComponent)
+        } else {
+            mainStack.replace(likedComponent)
         }
     }
 
@@ -58,7 +60,7 @@ ApplicationWindow {
         anchors.fill: parent
         spacing: 0
 
-        //中部：侧边栏 + 主内容
+        // 中部：侧边栏+主内容
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -75,45 +77,16 @@ ApplicationWindow {
                 Layout.margins: Style.spacingLarge
                 spacing: Style.spacingLarge
 
-                // //顶部tab切换栏
-                // RowLayout {
-                //     Layout.fillWidth: true
-                //     spacing: Style.spacingSmall
 
-                //     Button {
-                //         text: "播放列表"
-                //         font.pixelSize: Style.fontSizeNormal
-                //         checked: currentView === 0
-                //         checkable: true
-                //         onClicked: currentView = 0
-                //         background: Rectangle {
-                //             color: parent.checked ? Style.accentRed : Style.bgSecondary
-                //             radius: Style.radiusSmall
-                //         }
-                //     }
+                // 主内容区
+            StackView {
+                id: mainStack
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                //     Button {
-                //         text: "歌词"
-                //         font.pixelSize: Style.fontSizeNormal
-                //         checked: currentView === 1
-                //         checkable: true
-                //         onClicked: currentView = 1
-                //         background: Rectangle {
-                //             color: parent.checked ? Style.accentRed : Style.bgSecondary
-                //             radius: Style.radiusSmall
-                //         }
-                //     }
-                // }
-
-                //主内容区
-                StackView {
-                    id: mainStack
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    initialItem: PlaylistView {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                initialItem: PlaylistView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                     }
 
                     Component {
@@ -123,18 +96,26 @@ ApplicationWindow {
                             Layout.fillHeight: true
                         }
                     }
+
+                    Component {
+                        id: likedComponent
+                        LikedSongsView {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+                    }
                 }
             }
         }
 
-        //底部控制栏
+        // 底部控制栏
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 72
             color: Style.bgSecondary
             radius: 0
 
-            //顶部分割线
+            // 顶部分割线
             Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
@@ -151,32 +132,32 @@ ApplicationWindow {
                 anchors.bottomMargin: Style.spacingSmall
                 spacing: 0
 
-                //进度条
+                // 进度条
                 ProgressBar {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 20
                 }
 
-                //三栏布局：左侧歌曲信息，中间控制按钮，右侧音量
+                // 三栏布局：左侧歌曲信息,中间控制按钮,右侧音量
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: Style.spacingNormal
 
-                    //左侧：歌曲信息
+                    // 左侧：歌曲信息
                     SongInfoPanel {
                         Layout.fillHeight: true
                         Layout.preferredWidth: 200
                     }
 
-                    //中间：控制按钮
+                    // 中间：控制按钮（居中）
                     PlaybackControls {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                     }
 
-                    //右侧：音量控制
+                    // 右侧：音量控制
                     VolumeControl {
                         Layout.fillHeight: true
                         Layout.preferredWidth: 200
@@ -207,6 +188,70 @@ ApplicationWindow {
             if (musicManager.playlistModel.count === 1) {
                 musicManager.playIndex(0)
             }
+        }
+    }
+//}
+
+
+// 启动画面
+    Rectangle {
+        id: splashScreen
+        anchors.fill: parent
+        color: Style.bgPrimary
+        z: 999
+
+        Behavior on opacity {
+            NumberAnimation { duration: 600; easing.type: Easing.OutCubic }
+        }
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: Style.spacingLarge
+
+            // Logo 图标
+            Text {
+                text: "\u{1F3B5}"
+                font.pixelSize: 64
+                color: Style.accentRed
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            // 标题
+            Text {
+                text: "周易音乐播放器"
+                font.pixelSize: 28
+                font.bold: true
+                color: Style.textPrimary
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            // 副标题
+            Text {
+                text: "享受音乐，享受生活"
+                font.pixelSize: Style.fontSizeNormal
+                color: Style.textTertiary
+                Layout.alignment: Qt.AlignHCenter
+            }
+        }
+
+        //淡出时间
+        Timer {
+            interval: 2000
+            running: true
+            onTriggered: splashScreen.opacity = 0
+        }
+
+        // 淡出完成后移除
+        onOpacityChanged: {
+            if (opacity === 0) {
+                destroyTimer.start()
+            }
+        }
+
+        Timer {
+            id: destroyTimer
+            interval: 700
+            onTriggered: splashScreen.destroy()
         }
     }
 }

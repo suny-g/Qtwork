@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
     MusicManager musicManager;
     MetadataReader metadataReader;
 
-
     engine.rootContext()->setContextProperty("musicManager", &musicManager);
     engine.rootContext()->setContextProperty("metadataReader", &metadataReader);
 
