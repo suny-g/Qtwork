@@ -117,7 +117,10 @@ void MusicManager::play()
     if (m_currentIndex < 0 && m_playlistModel->count() > 0) {
         playIndex(0);
     } else {
-        m_player->play();  // 继续播放当前歌曲
+        if (m_currentIndex >= 0 && m_currentIndex < m_playlistModel->count()) {
+            loadLyricsForUrl(m_playlistModel->getUrl(m_currentIndex));
+        }
+        m_player->play();
     }
 }
 

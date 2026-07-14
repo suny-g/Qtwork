@@ -1,9 +1,10 @@
 // File:PlaylistView.qml   Version: 0.1.0   License: AGPLv3
 // Created:Junfeng Tu  2150319601@qq.com
-// Description: Playlist view component with song list and tap-to-play
+// Description: Playlist view component with song list, tap-to-play and delete
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import Music
 
@@ -14,9 +15,38 @@ GroupBox {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
+    property int deleteIndex: -1
+
     background: Rectangle {
         color: Style.bgSecondary
         radius: Style.radiusNormal
+    }
+
+    MessageDialog {
+        id: deleteDialog
+        title: "确认删除"
+        text: "确定要删除这首歌曲吗？"
+        buttons: MessageDialog.Ok | MessageDialog.Cancel
+
+        onAccepted: {
+            if (root.deleteIndex < 0 || root.deleteIndex >= musicManager.playlistModel.count) {
+                root.deleteIndex = -1
+                return
+            }
+
+            var wasCurrent = (root.deleteIndex === musicManager.playlistModel.currentIndex)
+            musicManager.playlistModel.removeSong(root.deleteIndex)
+
+            if (wasCurrent && musicManager.playlistModel.count > 0) {
+                musicManager.playIndex(0)
+            }
+
+            root.deleteIndex = -1
+        }
+
+        onRejected: {
+            root.deleteIndex = -1
+        }
     }
 
     ListView {
@@ -78,6 +108,32 @@ GroupBox {
                     text: Style.formatDuration(model.duration)
                     color: index === musicManager.playlistModel.currentIndex ? "#ffd6d6" : Style.textSecondary
                     font.pixelSize: Style.fontSizeSmall
+                }
+
+                Rectangle {
+                    width: 24
+                    height: 24
+                    radius: 12
+                    color: deleteArea.containsMouse ? Style.bgHover : "transparent"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "×"
+                        color: index === musicManager.playlistModel.currentIndex ? "white" : Style.textSecondary
+                        font.pixelSize: Style.fontSizeNormal
+                    }
+
+                    MouseArea {
+                        id: deleteArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onClicked: function(mouse) {
+                            mouse.accepted = true
+                            root.deleteIndex = index
+                            deleteDialog.open()
+                        }
+                    }
                 }
             }
         }
