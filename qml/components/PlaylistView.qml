@@ -114,7 +114,9 @@ GroupBox {
                     width: 24
                     height: 24
                     radius: 12
-                    color: deleteArea.containsMouse ? Style.bgHover : "transparent"
+                    color: deleteHovered ? Style.bgHover : "transparent"
+
+                    property bool deleteHovered: false
 
                     Text {
                         anchors.centerIn: parent
@@ -123,13 +125,14 @@ GroupBox {
                         font.pixelSize: Style.fontSizeNormal
                     }
 
-                    MouseArea {
-                        id: deleteArea
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    HoverHandler {
+                        id: deleteHoverHandler
+                        onHoveredChanged: parent.deleteHovered = hovered
+                    }
 
-                        onClicked: function(mouse) {
-                            mouse.accepted = true
+                    TapHandler {
+                        id: deleteTapHandler
+                        onTapped: {
                             root.deleteIndex = index
                             deleteDialog.open()
                         }

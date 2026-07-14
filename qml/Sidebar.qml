@@ -45,7 +45,8 @@ Rectangle {
             width: parent.width
             height: 36
             radius: Style.radiusSmall
-            color: ma1.containsMouse ? Style.bgHover : "transparent"
+            color: hovered1 ? Style.bgHover : "transparent"
+            property bool hovered1: false
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: Style.spacingNormal
@@ -54,14 +55,16 @@ Rectangle {
                 Text { text: "\u266B"; font.pixelSize: 14; color: Style.textSecondary }
                 Text { text: "发现音乐"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
-            MouseArea { id: ma1; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(0) }
+            HoverHandler { onHoveredChanged: parent.hovered1 = hovered }
+            TapHandler { onTapped: viewChanged(0) }
         }
 
         Rectangle {
             Layout.fillWidth: true
             height: 36
             radius: Style.radiusSmall
-            color: ma2.containsMouse ? Style.bgHover : "transparent"
+            color: hovered2 ? Style.bgHover : "transparent"
+            property bool hovered2: false
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: Style.spacingNormal
@@ -70,7 +73,8 @@ Rectangle {
                 Text { text: "\u{1F4C1}"; font.pixelSize: 14; color: Style.textSecondary }
                 Text { text: "本地音乐"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
-            MouseArea { id: ma2; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(0) }
+            HoverHandler { onHoveredChanged: parent.hovered2 = hovered }
+            TapHandler { onTapped: viewChanged(0) }
         }
 
         //我的音乐
@@ -87,7 +91,8 @@ Rectangle {
             Layout.fillWidth: true
             height: 36
             radius: Style.radiusSmall
-            color: ma3.containsMouse ? Style.bgHover : "transparent"
+            color: hovered3 ? Style.bgHover : "transparent"
+            property bool hovered3: false
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: Style.spacingNormal
@@ -96,14 +101,16 @@ Rectangle {
                 Text { text: "\u{1F3B6}"; font.pixelSize: 14; color: Style.textSecondary }
                 Text { text: "播放列表"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
-            MouseArea { id: ma3; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(0) }
+            HoverHandler { onHoveredChanged: parent.hovered3 = hovered }
+            TapHandler { onTapped: viewChanged(0) }
         }
 
         Rectangle {
-          Layout.fillWidth: true
+            Layout.fillWidth: true
             height: 36
             radius: Style.radiusSmall
-            color: ma4.containsMouse ? Style.bgHover : "transparent"
+            color: hovered4 ? Style.bgHover : "transparent"
+            property bool hovered4: false
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: Style.spacingNormal
@@ -112,14 +119,16 @@ Rectangle {
                 Text { text: "\u{1F3A4}"; font.pixelSize: 14; color: Style.textSecondary }
                 Text { text: "歌词"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
-            MouseArea { id: ma4; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(1) }
+            HoverHandler { onHoveredChanged: parent.hovered4 = hovered }
+            TapHandler { onTapped: viewChanged(1) }
         }
 
         Rectangle {
-           Layout.fillWidth: true
+            Layout.fillWidth: true
             height: 36
             radius: Style.radiusSmall
-            color: ma5.containsMouse ? Style.bgHover : "transparent"
+            color: hovered5 ? Style.bgHover : "transparent"
+            property bool hovered5: false
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: Style.spacingNormal
@@ -128,7 +137,8 @@ Rectangle {
                 Text { text: "\u2665"; font.pixelSize: 14; color: Style.textSecondary }
                 Text { text: "我喜欢"; font.pixelSize: Style.fontSizeNormal; color: Style.textPrimary; Layout.fillWidth: true }
             }
-            MouseArea { id: ma5; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: viewChanged(0) }
+            HoverHandler { onHoveredChanged: parent.hovered5 = hovered }
+            TapHandler { onTapped: viewChanged(0) }
         }
 
         Item { Layout.fillHeight: true }
