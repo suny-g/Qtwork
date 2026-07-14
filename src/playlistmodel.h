@@ -5,6 +5,7 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include <QSet>
 #include <QSettings>
 #include <QUrl>
 #include <QVariant>
@@ -54,17 +55,26 @@ public:
     Q_INVOKABLE QUrl getUrl(int index) const; //返回指定索引歌曲的文件URL
     Q_INVOKABLE QVariantMap get(int index) const; //返回指定索引歌曲的数据，用于QML访问
 
+    // 红心收藏
+    Q_INVOKABLE void toggleLike(const QUrl &url);  //切换收藏状态
+    Q_INVOKABLE bool isLiked(const QUrl &url) const;  //查询是否已收藏
+    Q_INVOKABLE QVariantList likedSongs() const;  //获取所有收藏歌曲
+
     void saveSongs() const;  //将播放列表保存到持久化存储
     void loadSongs();  //从持久化存储恢复播放列表
 
 signals:
     void countChanged();        // 歌曲数量变化时发射
     void currentIndexChanged(); // 当前索引变化时发射
+    void likedChanged();        // 收藏状态变化时发射
 
 private:
 
     QVariantMap songToMap(const SongInfo &song) const; // 将 SongInfo 对象转换为 QVariantMap，用于持久化存储
     SongInfo songFromMap(const QVariantMap &map) const;  //从 QVariantMap 恢复 SongInfo 对象，用于从持久化存储加载数据。
+    void saveLikedSongs() const;  //持久化收藏列表
+    void loadLikedSongs();  //恢复收藏列表
     QVector<SongInfo> m_songs;  //存储所有歌曲数据
+    QSet<QString> m_likedSongs;  //收藏的歌曲URL集合
     int m_currentIndex;  //存储当前正在播放的歌曲索引
 };

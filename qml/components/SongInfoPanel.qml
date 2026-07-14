@@ -2,7 +2,7 @@
 //File: SongInfoPanel.qml
 //Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-13
 //Version: 2.0      License: AGPLv3
-// Description: 歌曲信息区
+// Description: 歌曲信息区 — 封面缩略图 + 歌名/艺术家
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -15,13 +15,30 @@ Rectangle {
     Layout.fillHeight: true
     Layout.minimumWidth: 200
 
-    property bool liked: false
+    //获取当前歌曲URL
+    function getCurrentUrl() {
+        var idx = musicManager.playlistModel.currentIndex
+        if (idx >= 0 && idx < musicManager.playlistModel.count) {
+            return musicManager.playlistModel.getUrl(idx)
+        }
+        return ""
+    }
+
+    //绑定到后端收藏状态
+    property bool liked: getCurrentUrl() ? musicManager.playlistModel.isLiked(getCurrentUrl()) : false
+
+    //监听收藏状态变化和歌曲切换
+    Connections {
+        target: musicManager.playlistModel
+        function onLikedChanged() { root.liked = musicManager.playlistModel.isLiked(getCurrentUrl()) }
+        function onCurrentIndexChanged() { root.liked = musicManager.playlistModel.isLiked(getCurrentUrl()) }
+    }
 
     RowLayout {
         anchors.fill: parent
         spacing: Style.spacingNormal
 
-        // 专辑封面占位（网易云风格圆角方形）
+        //专辑封面占位（网易云风格圆角方形）
         Rectangle {
             id: coverArt
             implicitWidth: 44
@@ -31,7 +48,7 @@ Rectangle {
             border.width: 1
             border.color: Style.borderLight
 
-            // 封面占位图标
+            //封面占位图标
             Text {
                 anchors.centerIn: parent
                 text: "\u266A"
@@ -40,12 +57,12 @@ Rectangle {
             }
         }
 
-        // 歌名 + 艺术家
+        //歌名 + 艺术家
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 2
 
-            // 歌名
+            //歌名
             Text {
                 id: titleText
                 text: {
@@ -63,7 +80,7 @@ Rectangle {
                 Layout.fillWidth: true
             }
 
-            // 艺术家
+            //艺术家
             Text {
                 id: artistText
                 text: {
@@ -81,14 +98,17 @@ Rectangle {
             }
         }
 
-        // 红心收藏按钮
+        //红心收藏按钮
         Button {
             implicitWidth: 32
             implicitHeight: 32
             flat: true
             text: root.liked ? "\u2665" : "\u2661"
             font.pixelSize: 18
-            onClicked: root.liked = !root.liked
+            onClicked: {
+                var url = getCurrentUrl()
+                if (url) musicManager.playlistModel.toggleLike(url)
+            }
 
             contentItem: Text {
                 text: parent.text
