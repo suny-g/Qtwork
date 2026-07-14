@@ -1,55 +1,81 @@
 //Module
 //File: SongInfoPanel.qml
 //Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-13
-//Version: 1.0      License: AGPLv3
-//change the siza and location.
+//Version: 2.0      License: AGPLv3
+// Description:歌曲信息区
 import QtQuick
 import QtQuick.Layouts
 import Music
 
 Rectangle {
     id: root
-    color: Style.bgSecondary
-    radius: Style.radiusNormal
+    color: "transparent"
 
-    Layout.fillWidth: true
-    Layout.preferredHeight: 100
+    Layout.fillHeight: true
+    Layout.minimumWidth: 200
 
-    ColumnLayout {
-        anchors.fill: parent  //改为 fill parent，使布局填充整个区域
-        anchors.leftMargin: Style.spacingNormal   //加一点左边距
-        anchors.rightMargin: Style.spacingNormal
-        spacing: 5
+    RowLayout {
+        anchors.fill: parent
+        spacing: Style.spacingNormal
 
-        Text {
-            text: {
-                var idx = musicManager.playlistModel.currentIndex
-                if (idx >= 0 && idx < musicManager.playlistModel.count) {
-                    var item = musicManager.playlistModel.get(idx)
-                    return item.title ||"未知歌曲"
-                }
-                return "未播放"
+        // 专辑封面占位
+        Rectangle {
+            id: coverArt
+            implicitWidth: 44
+            implicitHeight: 44
+            radius: Style.radiusSmall
+            color: Style.bgTertiary
+            border.width: 1
+            border.color: Style.borderLight
+
+            //封面占位图标
+            Text {
+                anchors.centerIn: parent
+                text: "\u266A"
+                font.pixelSize: 20
+                color: Style.textTertiary
             }
-            font.pixelSize: Style.fontSizeTitle
-            font.bold: true
-            color: Style.textPrimary
-            horizontalAlignment: Text.AlignLeft //改为左对齐
-            Layout.fillWidth: true             //让文本占据整行宽度
         }
 
-        Text {
-            text: {
-                var idx = musicManager.playlistModel.currentIndex
-                if (idx >= 0 && idx < musicManager.playlistModel.count) {
-                    var item = musicManager.playlistModel.get(idx)
-                    return item.artist ||"未知艺术家"
+        //歌名 + 艺术家
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 2
+
+            //歌名
+            Text {
+                id: titleText
+                text: {
+                    var idx = musicManager.playlistModel.currentIndex
+                    if (idx >= 0 && idx < musicManager.playlistModel.count) {
+                        var item = musicManager.playlistModel.get(idx)
+                        return item.title || "未知歌曲"
+                    }
+                    return "未播放"
                 }
-                return "请选择音乐文件"
+                font.pixelSize: Style.fontSizeNormal
+                font.bold: true
+                color: Style.textPrimary
+                elide: Text.ElideRight
+                Layout.fillWidth: true
             }
-            font.pixelSize: Style.fontSizeNormal
-            color: Style.textSecondary
-            horizontalAlignment: Text.AlignLeft//改为左对齐
-            Layout.fillWidth: true             //让文本占据整行宽度
+
+            //艺术家
+            Text {
+                id: artistText
+                text: {
+                    var idx = musicManager.playlistModel.currentIndex
+                    if (idx >= 0 && idx < musicManager.playlistModel.count) {
+                        var item = musicManager.playlistModel.get(idx)
+                        return item.artist || "未知艺术家"
+                    }
+                    return "请选择音乐文件"
+                }
+                font.pixelSize: Style.fontSizeSmall
+                color: Style.textSecondary
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 //File: Main.qml
 //Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-14
 //Version: 2.0      License: AGPLv3
-// Description: 主窗口 — 网易云风格布局，支持播放列表/歌词视图切换
+// Description: 主窗口-网易云风格布局，支持播放列表/歌词视图切换
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -146,7 +146,8 @@ ApplicationWindow {
                     // 左侧：歌曲信息
                     SongInfoPanel {
                         Layout.fillHeight: true
-                        Layout.preferredWidth: 240
+                        Layout.preferredWidth: 200
+
                     }
 
                     // 中间：控制按钮
@@ -159,7 +160,7 @@ ApplicationWindow {
                     // 右侧：音量控制
                     VolumeControl {
                         Layout.fillHeight: true
-                        Layout.preferredWidth: 140
+                        Layout.preferredWidth: 200
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                     }
                 }

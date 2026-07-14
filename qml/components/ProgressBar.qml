@@ -19,7 +19,7 @@ Rectangle {
         anchors.fill: parent
         spacing: Style.spacingSmall
 
-        // 左侧：当前播放时间
+        //左侧：当前播放时间
         Text {
             text: Style.formatDuration(musicManager.position)
             font.pixelSize: Style.fontSizeMini
@@ -28,7 +28,7 @@ Rectangle {
             horizontalAlignment: Text.AlignRight
         }
 
-        // 中间：进度滑块
+        //中间：进度滑块
         Slider {
             id: progressSlider
             Layout.fillWidth: true
@@ -48,7 +48,7 @@ Rectangle {
                 radius: 1.5
                 color: Style.bgTertiary
 
-                // 已播放进度
+                //已播放进度
                 Rectangle {
                     width: progressSlider.visualPosition * parent.width
                     height: parent.height
@@ -68,7 +68,7 @@ Rectangle {
             }
         }
 
-        // 右侧：总时长
+        //右侧：总时长
         Text {
             text: Style.formatDuration(musicManager.duration)
             font.pixelSize: Style.fontSizeMini
