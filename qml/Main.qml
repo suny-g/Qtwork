@@ -2,7 +2,7 @@
 //File: Main.qml
 //Created:Guang Yang 2087167099@qq.com &&JunFeng Tu 2150319601@qq.com       2026-07-14
 //Version: 2.0      License: AGPLv3
-// Description: 主窗口-网易云风格布局，支持播放列表/歌词视图切换
+// Description: 主窗口 — 网易云风格布局，支持播放列表/歌词视图切换
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -15,7 +15,7 @@ ApplicationWindow {
     width: 800
     height: 600
     visible: true
-    title: "音乐播放器 v2.0"
+    title: "周易音乐播放器"
     color: Style.bgPrimary
 
     property bool darkTheme: true
@@ -56,65 +56,85 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Style.spacingLarge
-        spacing: Style.spacingLarge
+        spacing: 0
 
+        //中部：侧边栏 + 主内容
         RowLayout {
             Layout.fillWidth: true
-            spacing: Style.spacingSmall
-
-            Button {
-                text: "播放列表"
-                font.pixelSize: Style.fontSizeNormal
-                checked: currentView === 0
-                checkable: true
-                onClicked: currentView = 0
-                background: Rectangle {
-                    color: parent.checked ? Style.accentRed : Style.bgSecondary
-                    radius: Style.radiusSmall
-                }
-            }
-
-            Button {
-                text: "歌词"
-                font.pixelSize: Style.fontSizeNormal
-                checked: currentView === 1
-                checkable: true
-                onClicked: currentView = 1
-                background: Rectangle {
-                    color: parent.checked ? Style.accentRed : Style.bgSecondary
-                    radius: Style.radiusSmall
-                }
-            }
-        }
-
-        StackView {
-            id: mainStack
-            Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 0
 
-            initialItem: PlaylistView {
+            Sidebar {
+                id: sidebar
+                onViewChanged: function(view) { window.currentView = view }
+            }
+
+            ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-            }
+                Layout.margins: Style.spacingLarge
+                spacing: Style.spacingLarge
 
-            Component {
-                id: lyricsComponent
-                LyricsDisplay {
+                // //顶部tab切换栏
+                // RowLayout {
+                //     Layout.fillWidth: true
+                //     spacing: Style.spacingSmall
+
+                //     Button {
+                //         text: "播放列表"
+                //         font.pixelSize: Style.fontSizeNormal
+                //         checked: currentView === 0
+                //         checkable: true
+                //         onClicked: currentView = 0
+                //         background: Rectangle {
+                //             color: parent.checked ? Style.accentRed : Style.bgSecondary
+                //             radius: Style.radiusSmall
+                //         }
+                //     }
+
+                //     Button {
+                //         text: "歌词"
+                //         font.pixelSize: Style.fontSizeNormal
+                //         checked: currentView === 1
+                //         checkable: true
+                //         onClicked: currentView = 1
+                //         background: Rectangle {
+                //             color: parent.checked ? Style.accentRed : Style.bgSecondary
+                //             radius: Style.radiusSmall
+                //         }
+                //     }
+                // }
+
+                //主内容区
+                StackView {
+                    id: mainStack
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+
+                    initialItem: PlaylistView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    Component {
+                        id: lyricsComponent
+                        LyricsDisplay {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+                    }
                 }
             }
         }
 
-        // 底部控制栏
+        //底部控制栏
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 72
             color: Style.bgSecondary
             radius: 0
 
-            // 顶部分割线
+            //顶部分割线
             Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
@@ -131,33 +151,32 @@ ApplicationWindow {
                 anchors.bottomMargin: Style.spacingSmall
                 spacing: 0
 
-                // 进度条
+                //进度条
                 ProgressBar {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 20
                 }
 
-                // 三栏布局：左侧歌曲信息，中间控制按钮，右侧音量
+                //三栏布局：左侧歌曲信息，中间控制按钮，右侧音量
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: Style.spacingNormal
 
-                    // 左侧：歌曲信息
+                    //左侧：歌曲信息
                     SongInfoPanel {
                         Layout.fillHeight: true
                         Layout.preferredWidth: 200
-
                     }
 
-                    // 中间：控制按钮
+                    //中间：控制按钮
                     PlaybackControls {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                     }
 
-                    // 右侧：音量控制
+                    //右侧：音量控制
                     VolumeControl {
                         Layout.fillHeight: true
                         Layout.preferredWidth: 200
