@@ -1,6 +1,7 @@
 // Module
-// File: musicmanager.cpp   Version: 0.1.0   License: AGPLv3
+// File: musicmanager.h   Version: 0.1.0   License: AGPLv3
 // Created: Luojianqiu  2455043129@qq.com
+// Description: Music playback manager with playlist, lyrics and playback modes
 
 #pragma once
 
@@ -8,6 +9,7 @@
 #include <QMediaPlayer>
 #include <QAudioOutput>
 #include <QUrl>
+#include <QMap>
 #include "playlistmodel.h"
 #include "lyricssearcher.h"
 
@@ -80,19 +82,21 @@ private slots:
     void onMediaStatusChanged(QMediaPlayer::MediaStatus status); //监听媒体状态变化，处理播放结束自动切歌
 
 private:
-    void playCurrentIndex(); //重新播放当前索引指向的歌曲
+    void playCurrentIndex();
 
-    QMediaPlayer *m_player; //指向播放器
-    QAudioOutput *m_audioOutput; //控制声音输出
-    PlaylistModel *m_playlistModel; //存储所有歌曲数据
-    LyricsSearcher *m_lyricsSearcher; //歌词搜索器
-    int m_currentIndex;  //记录当前播放的是第几首歌
-    int m_playbackMode;  //记录当前的播放模式
-    QVariantList m_lyrics;  //存储歌词数据的列表
-    int m_currentLyricLine;  //当前歌词行索引
+    QMediaPlayer *m_player;
+    QAudioOutput *m_audioOutput;
+    PlaylistModel *m_playlistModel;
+    LyricsSearcher *m_lyricsSearcher;
+    int m_currentIndex;
+    int m_playbackMode;
+    QVariantList m_lyrics;
+    int m_currentLyricLine;
+    QMap<QString, QVariantList> m_lyricsCache; // 歌词缓存
 
-    int nextSequentialIndex() const;  //计算顺序模式下的下一首索引
-    int nextShuffleIndex() const; //计算随机模式下的下一首索引
-    void updatePlaceholderLyrics();  // 显示"暂无歌词"的占位文字
-    void loadLyricsForUrl(const QUrl &audioUrl);  //加载某首歌对应的歌词文件
+    int nextSequentialIndex() const;
+    int nextShuffleIndex() const;
+    void updatePlaceholderLyrics();
+    void loadLyricsForUrl(const QUrl &audioUrl);
+    QVariantList parseLyricsContent(const QString &content); // 解析歌词内容
 };

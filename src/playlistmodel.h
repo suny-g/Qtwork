@@ -1,5 +1,5 @@
 // Module
-// File: main.cpp   Version: 0.1.0   License: AGPLv3
+// File: playlistmodel.h   Version: 0.1.0   License: AGPLv3
 // Created: Luojianqiu  2455043129@qq.com
 
 #pragma once

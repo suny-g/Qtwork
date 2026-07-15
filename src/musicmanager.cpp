@@ -1,7 +1,7 @@
 // Module
 // File: musicmanager.cpp   Version: 0.1.0   License: AGPLv3
 // Created:LuoJianqiu 2455043129@qq.com
-// Description: Realize functions to control playback modes and load local lyrics.
+// Description: Control playback modes, load local lyrics with cache support
 
 #include "musicmanager.h"
 #include "playlistmodel.h"
@@ -376,36 +376,20 @@ void MusicManager::updatePlaceholderLyrics()
     emit lyricsChanged();
 }
 
-// 加载歌词文件
-void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
+// 解析歌词内容
+QVariantList MusicManager::parseLyricsContent(const QString &content)
 {
-    m_lyrics.clear();
-
-    if (!audioUrl.isLocalFile()) {
-        updatePlaceholderLyrics();
-        return;
-    }
-
-    QString audioPath = audioUrl.toLocalFile();
-    QFileInfo audioInfo(audioPath);
-    QString lrcPath = audioInfo.absolutePath() + "/" + audioInfo.completeBaseName() + ".lrc";
-
-    QFile lrcFile(lrcPath);
-    if (!lrcFile.exists() || !lrcFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        updatePlaceholderLyrics();
-        return;
-    }
-
-    QTextStream stream(&lrcFile);
-    stream.setEncoding(QStringConverter::Utf8);
+    QVariantList lyrics;
     QList<QPair<int, QString>> parsedLines;
 
     QRegularExpression re("\\[(\\d+):(\\d+)\\.(\\d+)\\]");
-    while (!stream.atEnd()) {
-        QString line = stream.readLine();
+    QStringList lines = content.split("\n");
+
+    for (const QString &line : lines) {
         QRegularExpressionMatchIterator it = re.globalMatch(line);
         QList<int> timestamps;
         int firstMatchEnd = -1;
+
         while (it.hasNext()) {
             QRegularExpressionMatch match = it.next();
             int minutes = match.captured(1).toInt();
@@ -413,6 +397,7 @@ void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
             QString fracStr = match.captured(3);
             int frac = fracStr.toInt();
             int msec = 0;
+
             if (fracStr.length() == 1) {
                 msec = frac * 100;
             } else if (fracStr.length() == 2) {
@@ -420,6 +405,7 @@ void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
             } else {
                 msec = frac;
             }
+
             int timeMs = minutes * 60000 + seconds * 1000 + msec;
             timestamps.append(timeMs);
             if (firstMatchEnd < 0) {
@@ -437,8 +423,6 @@ void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
         }
     }
 
-    lrcFile.close();
-
     std::sort(parsedLines.begin(), parsedLines.end(),
               [](const QPair<int, QString> &a, const QPair<int, QString> &b) {
                   return a.first < b.first;
@@ -448,11 +432,57 @@ void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
         QVariantMap entry;
         entry["time"] = p.first;
         entry["text"] = p.second;
-        m_lyrics.append(entry);
+        lyrics.append(entry);
     }
 
-    if (m_lyrics.isEmpty()) {
+    return lyrics;
+}
+
+// 加载歌词文件（带缓存）
+void MusicManager::loadLyricsForUrl(const QUrl &audioUrl)
+{
+    m_lyrics.clear();
+
+    if (!audioUrl.isLocalFile()) {
         updatePlaceholderLyrics();
+        return;
+    }
+
+    QString audioPath = audioUrl.toLocalFile();
+    QString cacheKey = audioPath;
+
+    // 检查缓存
+    if (m_lyricsCache.contains(cacheKey)) {
+        qDebug() << "[Lyrics] Using cached lyrics for:" << audioPath;
+        m_lyrics = m_lyricsCache[cacheKey];
+        setCurrentLyricLine(-1);
+        emit lyricsChanged();
+        return;
+    }
+
+    QFileInfo audioInfo(audioPath);
+    QString lrcPath = audioInfo.absolutePath() + "/" + audioInfo.completeBaseName() + ".lrc";
+
+    QFile lrcFile(lrcPath);
+    if (!lrcFile.exists() || !lrcFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "[Lyrics] LRC file not found or cannot open:" << lrcPath;
+        updatePlaceholderLyrics();
+        return;
+    }
+
+    QTextStream stream(&lrcFile);
+    stream.setEncoding(QStringConverter::Utf8);
+    QString content = stream.readAll();
+    lrcFile.close();
+
+    m_lyrics = parseLyricsContent(content);
+
+    if (m_lyrics.isEmpty()) {
+        qDebug() << "[Lyrics] No valid lyrics parsed for:" << audioPath;
+        updatePlaceholderLyrics();
+    } else {
+        qDebug() << "[Lyrics] Loaded" << m_lyrics.size() << "lines for:" << audioPath;
+        m_lyricsCache[cacheKey] = m_lyrics;
     }
 
     setCurrentLyricLine(-1);

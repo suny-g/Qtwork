@@ -1,5 +1,5 @@
 // Module
-// File: main.cpp   Version: 0.1.0   License: AGPLv3
+// File: metadatareader.h   Version: 0.1.0   License: AGPLv3
 // Created: Luojianqiu  2455043129@qq.com
 
 #pragma once
@@ -31,8 +31,15 @@ private slots:
     void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
 
 private:
+    struct Request {
+        QUrl url;
+        int requestId;
+    };
+
     QMediaPlayer *m_player;      // 媒体播放器
     QAudioOutput *m_audioOutput; // 音频输出
-    QUrl m_currentUrl;           // 当前正在读取的 URL
-    int m_currentRequestId;      // 当前请求 ID
+    QQueue<Request> m_requestQueue; // 请求队列
+    bool m_isProcessing;         // 是否正在处理请求
+
+    void processNextRequest();   // 处理下一个请求
 };
