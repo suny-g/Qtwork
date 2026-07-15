@@ -65,6 +65,13 @@ Rectangle {
                 clip: true
                 model: musicManager.lyrics
                 currentIndex: musicManager.currentLyricLine
+                highlightRangeMode: ListView.ApplyRange
+                preferredHighlightBegin: (height - 60) / 2
+                preferredHighlightEnd: (height + 60) / 2
+
+                Behavior on contentY {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
 
                 Text {
                     anchors.centerIn: parent
